@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html ng-app="expresso-chat">
+<head>
+  <title></title>
+  <script src="bower_components/angular/angular.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    var app = angular.module('expresso-chat', []);
+
+    app.factory('chat', function() {
+      var chat = {};
+      var socket;
+
+      chat.messages = [];
+
+      chat.start = function (username, callback) {
+        if (socket) {
+          socket.emit('disconnect');
+        }
+        socket = io.connect(window.location.origin);
+        socket.on('message:receive', function (data) {
+          chat.messages.push(data);
+          callback(chat.messages);
+        });
+      };
+
+      chat.sendMessage = function (user, message) {
+        socket.emit('message:send', {
+          user: user,
+          message: message}
+        );
+      };
+
+      return chat;
+    });
+
+    app.controller('ChatCtrl', function ($scope, chat) {
+
+      var me = this;
+
+      this.user = {
+        username: ''
+      };
+
+      this.message = '';
+
+      this.messages = [];
+
+      this.start = function () {
+        chat.start(this.user, function (messages) {
+          $scope.$apply(function () {
+            me.messages = messages;
+          });
+        });
+      };
+
+      this.sendMessage = function () {
+        chat.sendMessage(this.user, this.message);
+        this.message = '';
+      }
+    });
+  </script>
+</head>
+<body>
+  <div ng-controller="ChatCtrl as chatCtrl">
+    <section>
+      <h1>Start Chat</h1>
+      <form ng-submit="chatCtrl.start()">
+        <input type="text" id="name" ng-model="chatCtrl.user.username">
+        <input type="submit">
+      </form>
+    </section>
+    <section>
+      <h1>Messages</h1>
+      <ul>
+        <li ng-repeat="message in chatCtrl.messages">
+          {{ message.user.username }} -
+          {{ message.message }}
+        </li>
+      </ul>
+    </section>
+    <section>
+      <h1>Submit Message</h1>
+      <form ng-submit="chatCtrl.sendMessage()">
+        <label for="message">Message:</label>
+        <input id="message" ng-model="chatCtrl.message">
+        <input type="submit">
+      </form>
+    </section>
+  </div>
+</body>
+</html>

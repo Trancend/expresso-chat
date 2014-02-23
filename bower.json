@@ -1,0 +1,21 @@
+{
+  "name": "expresso-chat",
+  "version": "0.0.0",
+  "homepage": "https://github.com/Trancend/expresso-chat",
+  "authors": [
+    "Richard Harrington <rwharrington87@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "web/bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angularjs": "*",
+    "angular": "~1.2.13"
+  }
+}
